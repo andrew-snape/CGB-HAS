@@ -1,112 +1,83 @@
 # Centurion Garage Door Integration for Home Assistant
 
-This is a custom Home Assistant integration for **Centurion Smart Garage Door Openers** (e.g. SDO4) that support **local API control** via the MY CGD app.
-
-It allows you to control your garage door (open, close, stop), read its current status, and expose it to platforms like **Apple HomeKit**.
+This is a custom integration for **Centurion Smart Garage Door Openers** that support local API access through the MY CGD App. It allows full control and monitoring of the garage door, internal lamp, vacation mode, and camera feed.
 
 ---
 
-## 🔧 Features
+## ✅ Features
 
-- Open/Close/Stop garage door
-- Status polling
-- Works fully local (no cloud dependency)
-- Compatible with HomeKit via Home Assistant
-- Configurable via `configuration.yaml`
+- 🚪 Open, close, and stop garage door
+- 💡 Control garage lamp (on/off)
+- 🏖 Enable or disable vacation mode
+- 📷 View garage camera stream (`http://<ip>:88/`)
+- ⚙️ Setup directly via Home Assistant UI (no YAML required)
+- 🏠 HomeKit compatible through standard cover/switch/camera entities
 
 ---
 
 ## 📦 Installation
 
-### Step 1: Download & Install
+### Option 1: Manual
 
-1. Download the latest release (ZIP): [Releases Page](https://github.com/andrew-snape/CGB-HAS/releases)
-2. Extract the contents to:
+1. Download the [latest release](https://github.com/andrew-snape/CGB-HAS/releases)
+2. Extract to your Home Assistant config:
    ```
-   <your-home-assistant-config>/custom_components/centurion
-   ```
-
-   You should now have:
-   ```
-   custom_components/
-     └── centurion/
-         ├── __init__.py
-         ├── cover.py
-         ├── manifest.json
+   /config/custom_components/centurion/
    ```
 
 3. Restart Home Assistant.
+
+### Option 2: HACS (once published)
+
+Coming soon!
 
 ---
 
 ## ⚙️ Configuration
 
-Add the following to your `configuration.yaml` file:
+1. Go to **Settings → Devices & Services**
+2. Click **+ Add Integration**
+3. Search for **Centurion**
+4. Enter the **IP address** and **API key** from your MY CGD app
 
-```yaml
-cover:
-  - platform: centurion
-    ip_address: 192.168.X.X  # Replace with your device's local IP
-    api_key: YOUR_API_KEY     # Replace with your local API key from the MY CGD app
-```
-
-- `ip_address`: The **IP address** of your Centurion Smart Controller.
-- `api_key`: Your **local API key**, found in the MY CGD app.
-
-> You can test API access by visiting in your browser:
-> ```
-> http://192.168.X.X/api?key=YOUR_API_KEY&status=json
-> ```
+No YAML configuration required.
 
 ---
 
-## 🧪 Testing
+## 🧪 Entities Created
 
-After restarting HA, a new entity should appear:
-- `cover.centurion_garage_door`
-
-Use this entity in Home Assistant, HomeKit, automations, etc.
-
----
-
-## 🏠 HomeKit Integration
-
-To expose the garage door to HomeKit:
-
-```yaml
-homekit:
-  filter:
-    include_entities:
-      - cover.centurion_garage_door
-```
+| Entity Type | Name                            | Example Entity ID                |
+|-------------|----------------------------------|----------------------------------|
+| Cover       | Centurion Garage Door           | `cover.centurion_garage_door`   |
+| Switch      | Centurion Garage Lamp           | `switch.centurion_garage_lamp`  |
+| Switch      | Centurion Vacation Mode         | `switch.centurion_vacation_mode`|
+| Camera      | Centurion Garage Camera         | `camera.centurion_garage_camera`|
 
 ---
 
 ## 🛠 Troubleshooting
 
-- Ensure the device has a **static IP address** or DHCP reservation.
-- If no status appears, check your network and test the direct URL in a browser.
-- Use the IP address instead of the hostname if DNS resolution fails on your network.
+- Ensure your Centurion device has a **static IP** or DHCP reservation
+- API key must be from the **MY CGD** app under “Local API”
+- If camera doesn't load, try opening `http://<ip>:88/` directly
 
 ---
 
-## 💡 Future Ideas
+## 🧱 Roadmap
 
-- Add support for lamp control (`lamp=on/off`)
-- Add vacation mode toggle (`vacation=on/off`)
-- Add camera stream view (`http://<ip>:88/`)
-- Add configuration flow for UI-based setup
+- Config validation on setup
+- Lamp and vacation status polling
+- HACS submission and automatic updates
 
 ---
 
 ## 📜 License
 
-MIT
+MIT License
 
 ---
 
-## 🙌 Credit
+## 🙌 Credits
 
-Developed by [Andrew Snape](https://github.com/andrew-snape) based on Centurion's Local API documentation.
-
+Developed by [Andrew Snape](https://github.com/andrew-snape)  
 This project is not affiliated with Centurion or CGD.
