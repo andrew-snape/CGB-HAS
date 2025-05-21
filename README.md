@@ -20,7 +20,7 @@ It allows you to control your garage door (open, close, stop), read its current 
 
 ### Step 1: Download & Install
 
-1. Download the latest release (ZIP): [centurion_integration_updated.zip](https://github.com/YOUR_REPO_HERE)
+1. Download the latest release (ZIP): [Releases Page](https://github.com/andrew-snape/CGB-HAS/releases)
 2. Extract the contents to:
    ```
    <your-home-assistant-config>/custom_components/centurion
@@ -46,16 +46,16 @@ Add the following to your `configuration.yaml` file:
 ```yaml
 cover:
   - platform: centurion
-    ip_address: 192.168.0.8
-    api_key: a304d45d1d9d1316ae77bc2ae1de812b
+    ip_address: 192.168.X.X  # Replace with your device's local IP
+    api_key: YOUR_API_KEY     # Replace with your local API key from the MY CGD app
 ```
 
-- `ip_address`: The **IP address** of your Centurion Smart Controller (use IP, not hostname).
+- `ip_address`: The **IP address** of your Centurion Smart Controller.
 - `api_key`: Your **local API key**, found in the MY CGD app.
 
-> You can test API access by visiting:
+> You can test API access by visiting in your browser:
 > ```
-> http://192.168.0.8/api?key=YOUR_API_KEY&status=json
+> http://192.168.X.X/api?key=YOUR_API_KEY&status=json
 > ```
 
 ---
@@ -85,12 +85,12 @@ homekit:
 ## 🛠 Troubleshooting
 
 - Ensure the device has a **static IP address** or DHCP reservation.
-- If no status appears, check network and try the direct URL in your browser.
-- If your network does not resolve `CGD_XXXX`, use the IP instead.
+- If no status appears, check your network and test the direct URL in a browser.
+- Use the IP address instead of the hostname if DNS resolution fails on your network.
 
 ---
 
-## 💡 TODO / Future Ideas
+## 💡 Future Ideas
 
 - Add support for lamp control (`lamp=on/off`)
 - Add vacation mode toggle (`vacation=on/off`)
@@ -107,6 +107,6 @@ MIT
 
 ## 🙌 Credit
 
-Developed by [Your Name] based on Centurion's Local API documentation.
+Developed by [Andrew Snape](https://github.com/andrew-snape) based on Centurion's Local API documentation.
 
 This project is not affiliated with Centurion or CGD.
