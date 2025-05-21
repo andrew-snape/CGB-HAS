@@ -2,22 +2,41 @@ import logging
 import requests
 from homeassistant.components.cover import CoverEntity
 from homeassistant.const import STATE_CLOSED, STATE_OPEN
+import voluptuous as vol
+import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-URL = "http://192.168.1.100/api?key=a304d45d1d9d1316ae77bc2ae1de812b"
+CONF_IP = "ip_address"
+CONF_API_KEY = "api_key"
+
+DEFAULT_TIMEOUT = 5
+
+PLATFORM_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_IP): cv.string,
+        vol.Required(CONF_API_KEY): cv.string,
+    }
+)
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
-    add_entities([CenturionGarageDoor()])
+    ip = config[CONF_IP]
+    api_key = config[CONF_API_KEY]
+    add_entities([CenturionGarageDoor(ip, api_key)])
 
 class CenturionGarageDoor(CoverEntity):
 
-    def __init__(self):
+    def __init__(self, ip, api_key):
+        self._ip = ip
+        self._api_key = api_key
         self._state = STATE_CLOSED
+
+    def _base_url(self):
+        return f"http://{self._ip}/api?key={self._api_key}"
 
     def update(self):
         try:
-            response = requests.get(f"{URL}&status=json", timeout=5)
+            response = requests.get(f"{self._base_url()}&status=json", timeout=DEFAULT_TIMEOUT)
             data = response.json()
             self._state = STATE_OPEN if data["door"] == "open" else STATE_CLOSED
         except Exception as e:
@@ -32,10 +51,10 @@ class CenturionGarageDoor(CoverEntity):
         return self._state == STATE_CLOSED
 
     def open_cover(self, **kwargs):
-        requests.get(f"{URL}&door=open")
+        requests.get(f"{self._base_url()}&door=open")
 
     def close_cover(self, **kwargs):
-        requests.get(f"{URL}&door=close")
+        requests.get(f"{self._base_url()}&door=close")
 
     def stop_cover(self, **kwargs):
-        requests.get(f"{URL}&door=stop")
+        requests.get(f"{self._base_url()}&door=stop")
