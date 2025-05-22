@@ -2,43 +2,34 @@ import logging
 import requests
 from homeassistant.components.cover import CoverEntity
 from homeassistant.const import STATE_CLOSED, STATE_OPEN
-import voluptuous as vol
-import homeassistant.helpers.config_validation as cv
+from .const import DOMAIN, CONF_IP_ADDRESS, CONF_API_KEY
 
 _LOGGER = logging.getLogger(__name__)
 
-CONF_IP = "ip_address"
-CONF_API_KEY = "api_key"
-
-DEFAULT_TIMEOUT = 5
-
-PLATFORM_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_IP): cv.string,
-        vol.Required(CONF_API_KEY): cv.string,
-    }
-)
-
-def setup_platform(hass, config, add_entities, discovery_info=None):
-    ip = config[CONF_IP]
-    api_key = config[CONF_API_KEY]
-    add_entities([CenturionGarageDoor(ip, api_key)])
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    ip = config_entry.data[CONF_IP_ADDRESS]
+    api_key = config_entry.data[CONF_API_KEY]
+    async_add_entities([CenturionGarageDoor(ip, api_key)], update_before_add=True)
 
 class CenturionGarageDoor(CoverEntity):
-
     def __init__(self, ip, api_key):
         self._ip = ip
         self._api_key = api_key
         self._state = STATE_CLOSED
+        self._attr_unique_id = f"centurion_garage_{ip.replace('.', '_')}"
 
     def _base_url(self):
         return f"http://{self._ip}/api?key={self._api_key}"
 
     def update(self):
         try:
-            response = requests.get(f"{self._base_url()}&status=json", timeout=DEFAULT_TIMEOUT)
+            url = f"{self._base_url()}&status=json"
+            _LOGGER.debug(f"Fetching door status from: {url}")
+            response = requests.get(url, timeout=5)
             data = response.json()
-            self._state = STATE_OPEN if data["door"] == "open" else STATE_CLOSED
+            door_state = data.get("door", "").lower()
+            self._state = STATE_OPEN if door_state == "open" else STATE_CLOSED
+            _LOGGER.debug(f"Door status updated: {self._state}")
         except Exception as e:
             _LOGGER.error(f"Error updating Centurion door status: {e}")
 
@@ -51,10 +42,29 @@ class CenturionGarageDoor(CoverEntity):
         return self._state == STATE_CLOSED
 
     def open_cover(self, **kwargs):
-        requests.get(f"{self._base_url()}&door=open")
+        try:
+            url = f"{self._base_url()}&door=open"
+            _LOGGER.debug(f"Sending open command to: {url}")
+            requests.get(url, timeout=5)
+            self._state = STATE_OPEN
+            self.schedule_update_ha_state()
+        except Exception as e:
+            _LOGGER.error(f"Error sending open command: {e}")
 
     def close_cover(self, **kwargs):
-        requests.get(f"{self._base_url()}&door=close")
+        try:
+            url = f"{self._base_url()}&door=close"
+            _LOGGER.debug(f"Sending close command to: {url}")
+            requests.get(url, timeout=5)
+            self._state = STATE_CLOSED
+            self.schedule_update_ha_state()
+        except Exception as e:
+            _LOGGER.error(f"Error sending close command: {e}")
 
     def stop_cover(self, **kwargs):
-        requests.get(f"{self._base_url()}&door=stop")
+        try:
+            url = f"{self._base_url()}&door=stop"
+            _LOGGER.debug(f"Sending stop command to: {url}")
+            requests.get(url, timeout=5)
+        except Exception as e:
+            _LOGGER.error(f"Error sending stop command: {e}")

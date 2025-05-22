@@ -1,9 +1,10 @@
 {
   "domain": "centurion",
   "name": "Centurion Garage Door",
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "documentation": "https://github.com/andrew-snape/CGB-HAS",
   "requirements": [],
-  "codeowners": [],
-  "dependencies": [],
+  "codeowners": ["@andrew-snape"],
+  "config_flow": true,
   "iot_class": "local_polling"
 }
